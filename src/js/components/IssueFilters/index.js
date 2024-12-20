@@ -5,6 +5,7 @@ import { Container, Header } from "semantic-ui-react"
 import MultiSelect from "./../../components/inputs/MultiSelect"
 import PaginationMenu from "./PaginationMenu"
 import ResultOrder from "./ResultOrder"
+import DateRangePicker from "./../../components/inputs/DateRangePicker" // افترضنا وجود هذا المكون
 import { constants } from "./../../constants"
 
 const { languages, labels } = constants.search_filters
@@ -22,6 +23,8 @@ class IssueFilters extends Component {
       selectedPerPage,
       selectedSort,
       selectedOrder,
+      selectedStartDate,
+      selectedEndDate,
       location
     } = this.props
 
@@ -31,7 +34,9 @@ class IssueFilters extends Component {
       page: selectedPage,
       per_page: selectedPerPage,
       sort: selectedSort,
-      order: selectedOrder
+      order: selectedOrder,
+      start_date: selectedStartDate,
+      end_date: selectedEndDate
     }
 
     if (location.search) {
@@ -43,11 +48,13 @@ class IssueFilters extends Component {
         labels: (parsed.get("labels") || "").split(","),
         page: Number.parseInt(parsed.get("page")),
         sort: parsed.get("sort"),
-        order: parsed.get("order")
+        order: parsed.get("order"),
+        start_date: parsed.get("start_date"),
+        end_date: parsed.get("end_date")
       }
     }
 
-    //load api results with default filters
+    // load api results with default filters
     this.props.onInitialMount(query_filters)
   }
 
@@ -64,6 +71,10 @@ class IssueFilters extends Component {
       selectedOrder,
       selectedSortOrder,
       onSortOrderSelect,
+      selectedStartDate,
+      selectedEndDate,
+      onStartDateSelect,
+      onEndDateSelect,
       totalResults,
       children
     } = this.props
@@ -73,6 +84,7 @@ class IssueFilters extends Component {
         <Header size="medium">
           <Header.Content>Narrow your Search</Header.Content>
         </Header>
+        
         <FilterTitle>Languages</FilterTitle>
         <MultiSelect
           style={{ marginBottom: "4px" }}
@@ -86,10 +98,13 @@ class IssueFilters extends Component {
               page: 1,
               per_page: selectedPerPage,
               sort: selectedSort,
-              order: selectedOrder
+              order: selectedOrder,
+              start_date: selectedStartDate,
+              end_date: selectedEndDate
             })
           }}
         />
+        
         <FilterTitle>Labels</FilterTitle>
         <MultiSelect
           style={{ marginBottom: "4px" }}
@@ -103,10 +118,23 @@ class IssueFilters extends Component {
               page: 1,
               per_page: selectedPerPage,
               sort: selectedSort,
-              order: selectedOrder
+              order: selectedOrder,
+              start_date: selectedStartDate,
+              end_date: selectedEndDate
             })
           }}
         />
+
+        <FilterTitle>Date Range</FilterTitle>
+        <DateRangePicker
+          startDate={selectedStartDate}
+          endDate={selectedEndDate}
+          onChange={({ startDate, endDate }) => {
+            onStartDateSelect(startDate)
+            onEndDateSelect(endDate)
+          }}
+        />
+        
         <ResultOrder
           value={selectedSortOrder}
           onChange={value => {
@@ -117,11 +145,15 @@ class IssueFilters extends Component {
               page: 1,
               per_page: selectedPerPage,
               sort: parsed.get("sort"),
-              order: parsed.get("order")
+              order: parsed.get("order"),
+              start_date: selectedStartDate,
+              end_date: selectedEndDate
             })
           }}
         />
+        
         {children}
+
         <PaginationMenu
           selectedPage={selectedPage}
           selectedPerPage={selectedPerPage}
@@ -133,7 +165,9 @@ class IssueFilters extends Component {
               page: value,
               per_page: selectedPerPage,
               sort: selectedSort,
-              order: selectedOrder
+              order: selectedOrder,
+              start_date: selectedStartDate,
+              end_date: selectedEndDate
             })
           }}
         />
